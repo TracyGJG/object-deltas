@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Object-Deltas</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 90vw;
+        }
+
+        th {
+            color: #fff;
+            background-color: blue;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Object-Deltas function test harness</h1>
+    <h2>Press F12 and select Console to view the full set of test cases.</h2>
+
+    <h3>jobSimpleSampleCase</h3>
+    <div></div>
+
+    <hr>
+
+    <br>
+    <h3>jobSampleCase (JobA to JobB)</h3>
+    <div></div>
+    
+    <br>
+    <h3>jobSampleCase (JobB to JobC)</h3>
+    <div></div>
+
+    <br>
+    <h3>jobSampleCase (JobD to JobE)</h3>
+    <div></div>
+
+    <script src="object-deltas.js"></script>
+    <script src="tests/test-cases.js"></script>
+    <script src="tests/job-simple-sample-case.js"></script>
+    <script src="tests/job-sample-case.js"></script>
+    <script>
+        const presentDeltas = deltasArray => {
+            let deltasTable = `<table border='1'>`;
+            deltasTable += `<tr>
+                    <th>propName</th>
+                    <th>info</th>
+                    <th>obj1Val</th>
+                    <th>obj2Val</th>
+                </tr>`;
+            deltasArray.forEach(delta => {
+                deltasTable += `<tr>
+                    <td>${delta.propName}</td>
+                    <td>${delta.info}</td>
+                    <td>${delta.obj1Val}</td>
+                    <td>${delta.obj2Val}</td>
+                </tr>`;
+            });
+            return `${deltasTable}</table>`;
+        };
+
+        const arrayItemSimplifier = obj => obj._id;
+
+        (_ => {
+            const presentObjectDeltas = (j1, j2, bp, opt) => presentDeltas(objectDeltas(j1, j2, bp, opt));
+            const domTargets = document.querySelectorAll('div');
+
+            domTargets[0].innerHTML =
+                presentObjectDeltas(jobSimpleSampleCase.jobA, jobSimpleSampleCase.jobB);
+            domTargets[1].innerHTML =
+                presentObjectDeltas(jobSampleCase.jobA, jobSampleCase.jobB);
+            domTargets[2].innerHTML =
+                presentObjectDeltas(jobSampleCase.jobB, jobSampleCase.jobC, '', {
+                    debugMode: false, 
+                    arrayItemSimplifier
+                });
+            domTargets[3].innerHTML =
+                presentObjectDeltas(jobSampleCase.jobD, jobSampleCase.jobE, '', {
+                    exclusions: ['_id', 'archive', 'createdAt', 'updatedAt', 'userId', 'isValid', 'isAdded', 'isDeleted', 'comments'],
+                    arrayItemSimplifier
+                });
+
+            function baseObj() {
+                baseObj.prototype.delta = null;
+                baseObj.prototype.gamma = 'Gamma';
+            };
+
+            var testObj = new baseObj();
+            testObj.epsilon = [];
+            testObj.alpha = 'Alpha';
+            testObj._id = 'Identity';
+            console.log({ testObj });
+            console.log('defaultArrayItemSimplifier:', defaultArrayItemSimplifier(testObj));
+            console.log('arrayItemSimplifier:', arrayItemSimplifier(testObj));
+        })();
+    </script>
+</body>
+
+</html>
